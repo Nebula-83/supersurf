@@ -1,9 +1,83 @@
-<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width"><title>ClearView</title><link rel="stylesheet" href="popup.css"></head><body>
-<header><div class="mark">CV</div><div><h1>ClearView</h1><p>Make the web make sense.</p></div><a href="../options/options.html" title="Settings">⚙</a></header>
-<main><div class="status"><span></span><strong>Local protection on</strong><small>No browsing history collected</small></div>
-<label class="toggle"><span><b>Dismiss safe popups</b><small>Skips non-essential overlays, never login or payment dialogs.</small></span><input id="popups" type="checkbox"><i></i></label>
-<label class="toggle"><span><b>Mark broken links</b><small>Yellow underline for missing, invalid or empty destinations.</small></span><input id="links" type="checkbox"><i></i></label>
-<label class="toggle"><span><b>Surface download buttons</b><small>Highlights likely file actions without clicking them.</small></span><input id="downloads" type="checkbox"><i></i></label>
-<label class="toggle"><span><b>Focus mode</b><small>Quiet sidebars, ads and motion. Alt+Shift+F also toggles it.</small></span><input id="focus" type="checkbox"><i></i></label>
-<button id="diagnostics" class="secondary">Run page health check</button><button id="options" class="link">More settings &amp; safety notes →</button>
-</main><footer>ClearView 1.0 · Your page stays on your device</footer><script src="popup.js"></script></body></html>
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+  <title>ClearView</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <header class="app-header">
+    <div class="mark" aria-hidden="true">CV</div>
+    <div>
+      <h1>ClearView</h1>
+      <p>Make the web make sense.</p>
+    </div>
+    <a class="settings-link" href="../options/options.html" title="Open settings" aria-label="Open settings">⚙</a>
+  </header>
+
+  <main>
+    <section class="status-card" aria-labelledby="status-title">
+      <div class="status-dot" aria-hidden="true"></div>
+      <div>
+        <strong id="status-title">Protection is active</strong>
+        <small>Settings stay on this device. No browsing history is collected.</small>
+      </div>
+    </section>
+
+    <section class="controls" aria-label="ClearView controls">
+      <label class="toggle">
+        <span class="toggle-copy">
+          <b>Dismiss safe popups</b>
+          <small>Closes ad-focused overlays only. Sign-in, payment, consent and security dialogs stay untouched.</small>
+        </span>
+        <input id="popups" type="checkbox">
+        <span class="switch" aria-hidden="true"></span>
+      </label>
+
+      <label class="toggle">
+        <span class="toggle-copy">
+          <b>Mark broken links</b>
+          <small>Uses local signals to underline missing, invalid or empty destinations.</small>
+        </span>
+        <input id="links" type="checkbox">
+        <span class="switch" aria-hidden="true"></span>
+      </label>
+
+      <label class="toggle">
+        <span class="toggle-copy">
+          <b>Surface download buttons</b>
+          <small>Highlights likely file actions without clicking or downloading them.</small>
+        </span>
+        <input id="downloads" type="checkbox">
+        <span class="switch" aria-hidden="true"></span>
+      </label>
+
+      <label class="toggle">
+        <span class="toggle-copy">
+          <b>Focus mode</b>
+          <small>Quiet sidebars, ads and motion. Alt+Shift+F also toggles it.</small>
+        </span>
+        <input id="focus" type="checkbox">
+        <span class="switch" aria-hidden="true"></span>
+      </label>
+
+      <label class="toggle">
+        <span class="toggle-copy">
+          <b>Phishing and malware alerts</b>
+          <small>Shows local heuristic warnings. Alerts are not verdicts and page data stays on your device.</small>
+        </span>
+        <input id="riskAlerts" type="checkbox">
+        <span class="switch" aria-hidden="true"></span>
+      </label>
+    </section>
+
+    <p id="saveStatus" class="save-status" role="status" aria-live="polite">Loading settings…</p>
+    <button id="diagnostics" class="secondary" type="button">Run page health check</button>
+    <button id="options" class="link" type="button">More settings and safety notes <span aria-hidden="true">→</span></button>
+  </main>
+
+  <footer>ClearView 1.1.0 · Your page stays on your device</footer>
+  <script src="popup.js"></script>
+</body>
+</html>

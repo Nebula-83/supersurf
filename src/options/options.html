@@ -1,1 +1,105 @@
-<!doctype html><html><head><meta charset="utf-8"><title>ClearView settings</title><link rel="stylesheet" href="options.css"></head><body><main><div class="eyebrow">CLEARVIEW / SETTINGS</div><h1>A clearer web, by default.</h1><p class="lead">ClearView is a local-first assistant. It can label patterns and reduce distraction, but it will not bypass consent, paywalls, CAPTCHAs, security warnings, server-side timers or access controls.</p><section><h2>What each tool does</h2><ul><li><b>Popup dismissal</b> only clicks conservative “close” controls on overlays; forms, payments and sign-in dialogs are protected.</li><li><b>Broken links</b> marks obvious local problems. Network status is only a hint because cross-origin checks can be blocked.</li><li><b>Download detection</b> highlights likely actions using text, attributes and file extensions. It never downloads for you.</li><li><b>Page health</b> reports observable browser signals, not a definitive diagnosis of your ISP or server.</li></ul></section><section><h2>Privacy promise</h2><p>There are no analytics, remote scripts, cookies, page uploads or private AI calls. Selected text opens an explicit Google search only after your action.</p></section><section><h2>Next version ideas</h2><p>Optional per-site rules, a review queue before dismissing overlays, accessibility announcements, multilingual labels, and a local export of diagnostics.</p></section><a class="back" href="../popup/popup.html">← Back to controls</a></main></body></html>
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+  <title>ClearView settings</title>
+  <link rel="stylesheet" href="options.css">
+</head>
+<body>
+  <main>
+    <header class="page-header">
+      <a class="back" href="../popup/popup.html">← Back to controls</a>
+      <p class="eyebrow">CLEARVIEW / SETTINGS</p>
+      <h1>A clearer web, by default.</h1>
+      <p class="lead">Choose how ClearView helps on the pages you visit. Your choices are saved on this device and can be changed at any time.</p>
+    </header>
+
+    <section class="settings-card" aria-labelledby="protection-heading">
+      <h2 id="protection-heading">Protection preferences</h2>
+      <p class="section-intro">These controls affect the current tab when possible and apply to new pages.</p>
+
+      <label class="setting-toggle">
+        <span><b>Dismiss safe popups</b><small>Only closes ad-focused overlays. Sign-in, payment, consent and security dialogs are protected.</small></span>
+        <input id="popups" type="checkbox">
+        <span class="switch" aria-hidden="true"></span>
+      </label>
+      <label class="setting-toggle">
+        <span><b>Mark broken links</b><small>Underlines missing, malformed or empty destinations using local signals.</small></span>
+        <input id="links" type="checkbox">
+        <span class="switch" aria-hidden="true"></span>
+      </label>
+      <label class="setting-toggle">
+        <span><b>Surface download buttons</b><small>Highlights likely file actions without clicking or downloading them.</small></span>
+        <input id="downloads" type="checkbox">
+        <span class="switch" aria-hidden="true"></span>
+      </label>
+      <label class="setting-toggle">
+        <span><b>Focus mode</b><small>Reduces motion and visual distractions. The Alt+Shift+F shortcut also toggles it.</small></span>
+        <input id="focus" type="checkbox">
+        <span class="switch" aria-hidden="true"></span>
+      </label>
+      <label class="setting-toggle">
+        <span><b>Phishing and malware alerts</b><small>Shows local heuristic warnings. ClearView does not make a security verdict or upload page data.</small></span>
+        <input id="riskAlerts" type="checkbox">
+        <span class="switch" aria-hidden="true"></span>
+      </label>
+    </section>
+
+    <section class="settings-card" aria-labelledby="notice-heading">
+      <h2 id="notice-heading">Notice position</h2>
+      <p class="section-intro">Choose where regular ClearView notices appear. Selection-search confirmations always stay in the bottom-right corner.</p>
+      <fieldset class="choice-grid">
+        <legend class="sr-only">Regular notice position</legend>
+        <label class="choice">
+          <input id="notification-top-right" type="radio" name="notificationPosition" value="top-right">
+          <span><b>Top right</b><small>Keep notices beside the toolbar edge.</small></span>
+        </label>
+        <label class="choice">
+          <input id="notification-top-left" type="radio" name="notificationPosition" value="top-left">
+          <span><b>Top left</b><small>Keep notices away from the right side.</small></span>
+        </label>
+      </fieldset>
+    </section>
+
+    <section class="settings-card" aria-labelledby="focus-heading">
+      <h2 id="focus-heading">Focus outline color</h2>
+      <p class="section-intro">Pick the outline used around the main reading area in Focus mode.</p>
+      <fieldset class="color-grid">
+        <legend class="sr-only">Focus outline color</legend>
+        <label class="color-choice gold-choice">
+          <input id="focus-color-gold" type="radio" name="focusOutlineColor" value="gold">
+          <span><i aria-hidden="true"></i><b>Gold</b></span>
+        </label>
+        <label class="color-choice blue-choice">
+          <input id="focus-color-blue" type="radio" name="focusOutlineColor" value="blue">
+          <span><i aria-hidden="true"></i><b>Blue</b></span>
+        </label>
+        <label class="color-choice green-choice">
+          <input id="focus-color-green" type="radio" name="focusOutlineColor" value="green">
+          <span><i aria-hidden="true"></i><b>Green</b></span>
+        </label>
+      </fieldset>
+    </section>
+
+    <section class="settings-card" aria-labelledby="safety-heading">
+      <h2 id="safety-heading">Safety and privacy</h2>
+      <ul>
+        <li>ClearView makes local, explainable observations. It does not bypass paywalls, CAPTCHAs, security warnings, consent choices or access controls.</li>
+        <li>There are no analytics, remote scripts, cookies or page uploads. Selected text opens an explicit Google search only after you choose the context-menu action.</li>
+        <li>Page health and phishing or malware notices are hints from browser-visible signals, not a definitive diagnosis.</li>
+      </ul>
+    </section>
+
+    <section class="settings-card remove-card" aria-labelledby="remove-heading">
+      <h2 id="remove-heading">Remove ClearView</h2>
+      <p>Chrome requires you to confirm removal in its extensions manager. ClearView cannot remove itself silently.</p>
+      <button id="removeClearView" class="danger" type="button">Remove ClearView</button>
+      <p id="removeStatus" class="inline-status" role="status" aria-live="polite"></p>
+    </section>
+
+    <p id="saveStatus" class="save-status" role="status" aria-live="polite">Loading settings…</p>
+  </main>
+  <script src="../popup/popup.js"></script>
+</body>
+</html>

@@ -4,7 +4,12 @@
 .cv-download-link::after { content: 'ClearView: likely download'; position: absolute; z-index: 2147483646; top: 100%; left: 0; background: #102a43; color: #fff; padding: 5px 8px; font: 11px/1.2 system-ui; white-space: nowrap; border-radius: 5px; pointer-events: none; }
 .cv-focus-mode * { animation: none !important; transition: none !important; }
 .cv-focus-mode body > :not(main):not(article):not([role="main"]):not(.cv-panel), .cv-focus-mode [class*="sidebar"], .cv-focus-mode [class*="advert"], .cv-focus-mode [id*="advert"], .cv-focus-mode [class*="social-share"] { opacity: .12 !important; pointer-events: none !important; }
-.cv-focus-mode main, .cv-focus-mode article, .cv-focus-mode [role="main"] { max-width: 900px !important; margin-left: auto !important; margin-right: auto !important; }
-.cv-panel { position: fixed !important; z-index: 2147483647 !important; right: 18px !important; bottom: 18px !important; width: min(360px, calc(100vw - 36px)) !important; background: #102a43 !important; color: #f7fafc !important; border: 1px solid #486581 !important; border-radius: 14px !important; box-shadow: 0 14px 40px #102a4388 !important; padding: 16px !important; font: 13px/1.45 system-ui,sans-serif !important; }
+.cv-focus-mode main, .cv-focus-mode article, .cv-focus-mode [role="main"] { max-width: 900px !important; margin-left: auto !important; margin-right: auto !important; outline: 3px solid #f6c453 !important; outline-offset: 6px !important; }
+.cv-focus-mode[data-cv-focus-color="blue"] main, .cv-focus-mode[data-cv-focus-color="blue"] article, .cv-focus-mode[data-cv-focus-color="blue"] [role="main"] { outline-color: #4dabf7 !important; }
+.cv-focus-mode[data-cv-focus-color="green"] main, .cv-focus-mode[data-cv-focus-color="green"] article, .cv-focus-mode[data-cv-focus-color="green"] [role="main"] { outline-color: #52b788 !important; }
+.cv-panel { position: fixed !important; z-index: 2147483647 !important; top: auto !important; right: auto !important; bottom: auto !important; left: auto !important; width: min(360px, calc(100vw - 36px)) !important; background: #102a43 !important; color: #f7fafc !important; border: 1px solid #486581 !important; border-radius: 14px !important; box-shadow: 0 14px 40px #102a4388 !important; padding: 16px !important; font: 13px/1.45 system-ui,sans-serif !important; }
+.cv-panel[data-cv-position="bottom-right"] { right: 18px !important; bottom: 18px !important; }
+.cv-panel[data-cv-position="top-right"] { right: 18px !important; top: 18px !important; }
+.cv-panel[data-cv-position="top-left"] { left: 18px !important; top: 18px !important; }
 .cv-panel button { float: right; background: transparent; color: #f6c453; border: 0; font-size: 18px; cursor: pointer; }
 .cv-panel strong { color: #f6c453; }

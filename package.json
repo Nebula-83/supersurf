@@ -1,6 +1,6 @@
 {
   "name": "clearview-browser-extension",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "private": true,
   "type": "module",
   "description": "ClearView: a privacy-first Chrome extension for calmer, more understandable web pages.",

@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "ClearView — calmer web, clearer actions",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Dismiss noisy popups, surface trustworthy actions, focus on content, and explain page health without tracking you.",
   "minimum_chrome_version": "110",
   "permissions": ["storage", "activeTab", "scripting", "contextMenus"],

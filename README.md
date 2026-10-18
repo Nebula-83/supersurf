@@ -1,58 +1,65 @@
 # ClearView
 
-ClearView is a polished Chrome Manifest V3 prototype for the OmniRush Agentic Buildathon 2026. It keeps pages usable without collecting browsing history: dismiss conservative non-essential overlays, mark obvious broken links in yellow, surface likely download controls, reduce visual noise with Focus mode, and show local page-health signals.
+ClearView is a Chrome extension for calmer, more understandable web pages. It can reduce distracting overlays, point out likely broken links, highlight likely download actions, and add a reversible Focus mode. All of these features are designed to be cautious and explainable.
 
-## Product promise and boundaries
+## Install
 
-This is an assistive web navigator, not an access-control bypass. It never disables an ad blocker, defeats a CAPTCHA, skips a paywall, removes a security warning, submits forms, starts downloads, or changes server-side timers. A page may still require its own 15-second server-controlled wait. The diagnostics label what the browser can observe and cannot prove an ISP or server fault.
+### From a GitHub Release
 
-The Google feature is intentionally explicit: select text and choose **Search ClearView selection with Google** from the context menu. It opens Google in a new tab; no private AI endpoint or API key is required.
+1. Download the latest `clearview-v*.zip` from the repository's **Releases** page.
+2. Unzip it into a folder you can keep on your computer. The folder must contain `manifest.json` at its top level.
+3. Open `chrome://extensions` in Chrome and turn on **Developer mode**.
+4. Choose **Load unpacked** and select the unzipped ClearView folder.
+5. Pin ClearView from Chrome's extensions menu if you want quick access to its home popup.
 
-## Features
+Chrome may disable an unpacked extension when its folder is moved or deleted. Keep the folder in place while using it.
 
-- **Safe popup dismissal:** clicks only recognizable close/dismiss controls on likely overlays; leaves login, payment and security dialogs alone.
-- **Broken-link markers:** yellow wavy underline for empty, malformed, unsupported, or missing same-page targets. Cross-origin links are marked “needs a network check” rather than falsely declared broken.
-- **Download spotlight:** green outline for likely download/export actions based on accessible text, attributes and file extensions; it never clicks them.
-- **Focus mode:** reversible, namespaced CSS reduces motion and visual distractions; toggle in the popup or with `Alt+Shift+F`.
-- **Page health:** observed resource counts, slow resources and possible failures, clearly labelled as heuristics.
-- **Settings page:** privacy promise, safety notes and next-version ideas.
+### Build from this repository
 
-## Build and test
-
-Requirements: Node **20.18.0** (see `.nvmrc`) and npm. Dependencies are intentionally zero so the checks work offline.
+Requirements: Node **20.18.0** or a compatible newer Node release (the pinned version is in `.nvmrc`) and npm.
 
 ```bash
 npm ci
 npm test
 npm run build
-# or
-make check
 ```
 
-`npm run build` creates `dist/`, a clean unpacked extension copy. The Docker build runs the same offline checks:
+The build creates an unpacked extension in `dist/` and a release-ready archive at `dist/clearview-v1.1.0.zip`. The archive has `manifest.json` at its root and does not contain a copy of itself.
+
+## Use ClearView
+
+Click the ClearView toolbar icon to open the home popup. Its controls are saved on this device:
+
+- **Dismiss safe popups** closes only ad-focused overlays. Sign-in, payment, consent and security dialogs are left alone.
+- **Mark broken links** underlines links that have obvious local problems. A cross-site link may still need a network check.
+- **Surface download buttons** highlights likely download or export actions without clicking them.
+- **Focus mode** reduces motion and visual distractions around the main reading area. `Alt+Shift+F` is also available as a shortcut.
+- **Phishing and malware alerts** shows local heuristic warnings. These warnings are signals to review, not security verdicts.
+
+Open **More settings and safety notes** for the full preferences page. There you can choose regular notice placement (top-right or top-left) and the Focus outline color (gold, blue or green). Selection-search confirmations always remain in the bottom-right corner.
+
+To search selected text, select it on a normal web page, open the context menu, and choose the single ClearView selection-search item. A Google results tab opens only after that action.
+
+Chrome-managed pages and the Chrome Web Store do not allow ClearView's page tools.
+
+## Safety and privacy
+
+ClearView processes its page observations locally. It does not collect browsing history, use analytics, load remote scripts, set cookies, upload page contents, or call a private AI service. Diagnostics describe browser-visible signals and cannot prove an ISP, server, phishing or malware condition.
+
+ClearView does not bypass paywalls, CAPTCHAs, security warnings, consent choices, access controls or server-controlled waits. It never submits forms, starts downloads, or changes a page's security settings.
+
+## Remove ClearView
+
+Open **More settings and safety notes**, scroll to **Remove ClearView**, and choose **Remove ClearView**. Chrome requires you to confirm the removal in its extensions manager, so ClearView opens `chrome://extensions` for that confirmation instead of removing itself silently.
+
+## Test and release
+
+Run the same checks used for a release from the repository root:
 
 ```bash
+npm ci
+npm test
+npm run build
 ```
 
-## Try it in Chrome
-
-1. Run `npm run build`.
-2. Open `chrome://extensions`, enable **Developer mode**, choose **Load unpacked**, and select the repository's `dist/` folder.
-3. Open a normal `http://` or `https://` page, click the ClearView toolbar icon, and toggle tools. Chrome internal pages and the Web Store are intentionally unsupported.
-4. Reload the page after changing the extension during development.
-
-## Publish to Chrome Web Store
-
-1. Create a developer account at the Chrome Web Store Developer Dashboard and complete the one-time registration fee/verification if requested.
-2. Run `npm run build`; zip the **contents** of `dist/` so `manifest.json` is at the zip root: `cd dist && zip -r ../clearview-1.0.0.zip .`.
-3. In the dashboard choose **New item**, upload the zip, and complete the store listing, screenshots, icon, support URL and privacy disclosures.
-4. Explain the narrow permissions (`storage`, `activeTab`, `scripting`, `contextMenus`) and state that no browsing data is collected. Do not claim it bypasses timers or ad-block detection.
-5. Test the uploaded artifact, complete the privacy practices tab, and submit for review. Keep the source, lockfile, Dockerfile and checks in GitHub for judges and reproducibility; upload only the built zip to the store.
-
-## Hackathon repository checklist
-
-Commit `manifest.json`, source under `src/`, tests, `package-lock.json`, `.nvmrc`, `Dockerfile`, `Makefile`, `README.md` and the icon. Do not commit `.env` files, tokens, Chrome profiles, generated `dist/` output, or private user data. Suggested demo: show a noisy fixture page, toggle Focus mode, point out yellow broken-link and green download annotations, then run the page-health panel and use the selection context menu.
-
-## Next version ideas
-
-Per-site rules with a review queue, keyboard-accessible overlay summaries, multilingual heuristics, a local history of diagnostics, optional on-device text explanations, and a browser-side “why this was highlighted?” inspector would add value without requiring a data-collecting backend.
+`npm test` runs the offline test suite. `npm run build` recreates `dist/`, copies the extension files, and creates `dist/clearview-v1.1.0.zip`. To publish a GitHub Release, upload that zip as a release asset and include its version in the release title. Users should unzip the asset before choosing **Load unpacked** in Chrome.
