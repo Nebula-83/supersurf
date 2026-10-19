@@ -1,14 +1,14 @@
 {
   "manifest_version": 3,
-  "name": "ClearView — calmer web, clearer actions",
-  "version": "1.1.0",
-  "description": "Dismiss noisy popups, surface trustworthy actions, focus on content, and explain page health without tracking you.",
+  "name": "SuperSurf",
+  "version": "1.2.0",
+  "description": "Dismiss ad-focused overlays, mark obvious broken links, highlight likely downloads, focus on content, and report page health locally.",
   "minimum_chrome_version": "110",
   "permissions": ["storage", "activeTab", "scripting", "contextMenus"],
   "background": { "service_worker": "src/background/service-worker.js", "type": "module" },
   "options_page": "src/options/options.html",
   "commands": {
-    "toggle-focus": { "suggested_key": { "default": "Alt+Shift+F" }, "description": "Toggle ClearView focus mode" }
+    "toggle-focus": { "suggested_key": { "default": "Alt+Shift+F" }, "description": "Toggle SuperSurf focus mode" }
   },
   "content_scripts": [{
     "matches": ["http://*/*", "https://*/*"],
@@ -16,6 +16,6 @@
     "css": ["src/content/content.css"],
     "run_at": "document_idle"
   }],
-  "action": { "default_title": "Open ClearView", "default_popup": "src/popup/popup.html", "default_icon": { "16": "assets/icon-16.png", "48": "assets/icon-48.png", "128": "assets/icon-128.png" } },
+  "action": { "default_title": "Open SuperSurf", "default_popup": "src/popup/popup.html", "default_icon": { "16": "assets/icon-16.png", "48": "assets/icon-48.png", "128": "assets/icon-128.png" } },
   "icons": { "16": "assets/icon-16.png", "48": "assets/icon-48.png", "128": "assets/icon-128.png" }
 }

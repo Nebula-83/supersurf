@@ -4,12 +4,12 @@ const defaults = {
   downloads: true,
   focus: false,
   diagnostics: true,
-  riskAlerts: true,
   notificationPosition: 'top-right',
   focusOutlineColor: 'gold'
 };
 
-const toggleIds = ['popups', 'links', 'downloads', 'focus', 'riskAlerts'];
+const settingKeys = Object.keys(defaults);
+const toggleIds = ['popups', 'links', 'downloads', 'focus'];
 const positionIds = ['notification-top-right', 'notification-top-left'];
 const colorIds = ['focus-color-gold', 'focus-color-blue', 'focus-color-green'];
 const query = (id) => document.getElementById(id);
@@ -28,20 +28,31 @@ function callChrome(method, args = []) {
     try {
       const result = method(...args, finish);
       if (result && typeof result.then === 'function') result.then(finish, reject);
+      else if (result !== undefined) finish(result);
     } catch (error) {
       reject(error);
     }
   });
 }
 
+function normalizeSettings(values = {}) {
+  const settings = { ...defaults };
+  settingKeys.forEach((key) => {
+    if (Object.prototype.hasOwnProperty.call(values, key)) settings[key] = values[key];
+  });
+  ['popups', 'links', 'downloads', 'focus', 'diagnostics'].forEach((key) => {
+    settings[key] = Boolean(settings[key]);
+  });
+  if (!['top-right', 'top-left'].includes(settings.notificationPosition)) settings.notificationPosition = defaults.notificationPosition;
+  if (!['gold', 'blue', 'green'].includes(settings.focusOutlineColor)) settings.focusOutlineColor = defaults.focusOutlineColor;
+  return settings;
+}
+
 async function loadSettings() {
   if (!storage?.get) return { ...defaults };
   try {
     const values = await callChrome(storage.get.bind(storage), [defaults]);
-    const settings = { ...defaults, ...(values || {}) };
-    if (!['top-right', 'top-left'].includes(settings.notificationPosition)) settings.notificationPosition = defaults.notificationPosition;
-    if (!['gold', 'blue', 'green'].includes(settings.focusOutlineColor)) settings.focusOutlineColor = defaults.focusOutlineColor;
-    return settings;
+    return normalizeSettings(values || {});
   } catch {
     return { ...defaults };
   }
@@ -57,7 +68,7 @@ function readControls() {
   const color = document.querySelector('input[name="focusOutlineColor"]:checked');
   if (position?.value) settings.notificationPosition = position.value;
   if (color?.value) settings.focusOutlineColor = color.value;
-  return settings;
+  return normalizeSettings(settings);
 }
 
 function applyControls(settings) {
@@ -93,12 +104,12 @@ async function sendToActiveTab(settings) {
 
 async function saveSettings() {
   const settings = readControls();
-  currentSettings = settings;
+  currentSettings = normalizeSettings(settings);
   setStatus('Saving settings…');
   try {
     if (!storage?.set) throw new Error('Local storage is unavailable');
-    await callChrome(storage.set.bind(storage), [settings]);
-    await sendToActiveTab(settings);
+    await callChrome(storage.set.bind(storage), [currentSettings]);
+    await sendToActiveTab(currentSettings);
     setStatus('Saved on this device.');
   } catch {
     setStatus('Could not save settings. Please try again.');
@@ -151,7 +162,7 @@ async function openRemovalPage() {
 toggleIds.concat(positionIds, colorIds).forEach((id) => query(id)?.addEventListener('change', saveSettings));
 query('diagnostics')?.addEventListener('click', runDiagnostics);
 query('options')?.addEventListener('click', openOptions);
-query('removeClearView')?.addEventListener('click', openRemovalPage);
+query('removeSuperSurf')?.addEventListener('click', openRemovalPage);
 
 (async () => {
   currentSettings = await loadSettings();

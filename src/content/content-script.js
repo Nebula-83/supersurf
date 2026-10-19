@@ -1,56 +1,122 @@
 (function () {
-  const A = globalThis.ClearViewAnalyzers;
+  const A = globalThis.SuperSurfAnalyzers;
   const defaults = {
     popups: true,
     links: true,
     downloads: true,
     focus: false,
     diagnostics: true,
-    riskAlerts: true,
     notificationPosition: 'top-right',
     focusOutlineColor: 'gold'
   };
+  const candidateSelector = 'a,button,[role="button"]';
   const scanDebounceMs = 250;
   const minScanIntervalMs = 800;
   let settings = { ...defaults };
   let scanTimer = 0;
   let lastScanAt = 0;
-  let riskNoticeShown = false;
-  const send = (type, payload = {}) => chrome.runtime.sendMessage({ type, ...payload }).catch(() => {});
+  let lastScanSignature = '';
+  const focusMarkers = new Map();
 
   function toast(title, body, kind = 'alert') {
-    document.querySelector('.cv-panel')?.remove();
-    const box = document.createElement('aside'); box.className = 'cv-panel';
+    document.querySelector('.ss-panel')?.remove();
+    const box = document.createElement('aside');
+    box.className = 'ss-panel';
     const position = kind === 'selection' ? 'bottom-right' : A.normalizeNotificationPosition(settings.notificationPosition);
-    box.dataset.cvPosition = position;
-    box.dataset.cvNoticeKind = kind;
+    box.dataset.ssPosition = position;
+    box.dataset.ssNoticeKind = kind;
+
     const close = document.createElement('button');
     close.type = 'button';
     close.setAttribute('aria-label', 'Close notification');
     close.textContent = '×';
     close.onclick = () => box.remove();
+
     const heading = document.createElement('strong');
-    heading.textContent = title;
+    heading.textContent = String(title);
     const message = document.createElement('div');
-    message.textContent = body;
+    message.textContent = String(body);
     box.append(close, heading, message);
-    document.body.append(box);
+    document.body?.append(box);
   }
 
   function dismissPopups() {
     let count = 0;
     document.querySelectorAll('body *').forEach(el => {
-      if (!A.isLikelyOverlay(el)) return;
-      const close = [...el.querySelectorAll('button,[role="button"],a')].find(b => A.isSafeDismissLabel(b.innerText || b.getAttribute('aria-label') || ''));
-      if (close) { close.click(); count++; }
+      if (!el.isConnected || el.matches?.('.ss-panel,.ss-panel *') || !A.isLikelyOverlay(el)) return;
+      const close = [...el.querySelectorAll('button,[role="button"],a')].find(button => {
+        if (A.isProtectedElement(button)) return false;
+        if (button.hasAttribute('download')) return false;
+        const likelyDownload = A.scoreDownload(
+          button.innerText || button.getAttribute('aria-label') || '',
+          button.getAttribute('href') || button.getAttribute('data-href') || '',
+          button.dataset
+        );
+        if (likelyDownload.likely) return false;
+        return A.isSafeDismissLabel(button.innerText || button.getAttribute('aria-label') || '');
+      });
+      if (close) {
+        close.click();
+        count++;
+      }
     });
-    if (count) toast('Ad overlays cleared', `${count} ad-focused overlay${count === 1 ? '' : 's'} dismissed. Cookie, consent, login, payment and security dialogs stay untouched.`);
+    if (count) toast('Ad overlays cleared', `${count} ad-focused overlay${count === 1 ? '' : 's'} dismissed. Protected cookie, consent, login, payment and security content was left alone.`);
+  }
+
+  function candidateText(el) {
+    return (el.innerText || el.textContent || '').replace(/\s+/g, ' ').trim().slice(0, 240);
+  }
+
+  function candidateFingerprint(el) {
+    const download = el.getAttribute('download');
+    const attrs = [
+      el.tagName,
+      el.getAttribute('href') || '',
+      el.getAttribute('data-href') || '',
+      download === null ? '' : `download:${download}`,
+      el.getAttribute('aria-label') || '',
+      candidateText(el),
+      A.isProtectedElement(el) ? 'protected' : 'normal'
+    ];
+    return attrs.join('\u001f');
+  }
+
+  function scanSignature() {
+    const candidates = [...document.querySelectorAll(candidateSelector)];
+    return `${settings.links ? 'links' : 'no-links'}|${settings.downloads ? 'downloads' : 'no-downloads'}|${candidates.map(candidateFingerprint).join('\u001e')}`;
+  }
+
+  function scanCandidate(el) {
+    const protectedContent = A.isProtectedElement(el);
+    const isLink = el.matches('a');
+
+    if (settings.links && isLink && !protectedContent) {
+      const result = A.classifyLink(el.getAttribute('href'), location.href);
+      el.classList.toggle('ss-broken-link', result.status === 'broken');
+    } else if (isLink) {
+      el.classList.remove('ss-broken-link');
+    }
+
+    if (settings.downloads && !protectedContent) {
+      const attrs = { ...el.dataset };
+      if (el.hasAttribute('download')) attrs.download = el.getAttribute('download') || '';
+      const result = A.scoreDownload(
+        el.innerText || el.getAttribute('aria-label') || '',
+        el.getAttribute('href') || el.getAttribute('data-href') || '',
+        attrs
+      );
+      el.classList.toggle('ss-download-link', result.likely);
+    } else {
+      el.classList.remove('ss-download-link');
+    }
   }
 
   function performScan() {
     lastScanAt = Date.now();
-    if (settings.links) document.querySelectorAll('a').forEach(link => { const c = A.classifyLink(link.getAttribute('href'), location.href); link.classList.toggle('cv-broken-link', c.status === 'broken'); if (c.status === 'broken') link.title = `ClearView: ${c.reason}`; });
-    if (settings.downloads) document.querySelectorAll('a,button,[role="button"]').forEach(el => { const c = A.scoreDownload(el.innerText || el.getAttribute('aria-label') || '', el.href || el.getAttribute('data-href') || '', el.dataset); el.classList.toggle('cv-download-link', c.likely); if (c.likely) el.title = `ClearView: ${c.reasons.join(', ')}`; });
+    const signature = scanSignature();
+    if (signature === lastScanSignature) return;
+    lastScanSignature = signature;
+    document.querySelectorAll(candidateSelector).forEach(scanCandidate);
   }
 
   function scheduleScan(immediate = false) {
@@ -63,51 +129,112 @@
     }, delay);
   }
 
-  function focus(enabled, outlineColor) {
-    const root = document.documentElement;
-    const color = A.normalizeFocusOutlineColor(outlineColor || settings.focusOutlineColor);
-    root.classList.toggle('cv-focus-mode', Boolean(enabled));
-    if (enabled) root.dataset.cvFocusColor = color;
-    else delete root.dataset.cvFocusColor;
+  function addFocusMarker(el, className) {
+    if (!el || el.nodeType !== 1) return;
+    if (!el.classList.contains(className)) {
+      el.classList.add(className);
+      const classes = focusMarkers.get(el) || new Set();
+      classes.add(className);
+      focusMarkers.set(el, classes);
+    }
   }
 
-  function reportRisk() {
-    if (!settings.riskAlerts) {
-      document.querySelector('.cv-panel[data-cv-notice-kind="risk"]')?.remove();
-      riskNoticeShown = false;
+  function clearFocusMarkers() {
+    focusMarkers.forEach((classes, el) => classes.forEach(className => el.classList.remove(className)));
+    focusMarkers.clear();
+  }
+
+  function findFocusTarget() {
+    return [...document.querySelectorAll('main,article,[role="main"],[itemprop="articleBody"]')]
+      .find(el => !A.isProtectedElement(el));
+  }
+
+  function focus(enabled, outlineColor) {
+    const root = document.documentElement;
+    clearFocusMarkers();
+    root.classList.toggle('ss-focus-mode', Boolean(enabled));
+    root.classList.remove('ss-focus-has-target');
+    if (!enabled) {
+      delete root.dataset.ssFocusColor;
       return;
     }
-    if (riskNoticeShown) return;
-    const risk = A.analyzePageRisk(location.href);
-    if (!risk.flagged) return;
-    riskNoticeShown = true;
-    toast('Heuristic safety signal', `Local heuristic only: ${risk.signals.join(', ')}. This is not proof of phishing or malware; ClearView sends no URL or page text.`, 'risk');
+
+    const target = findFocusTarget();
+    if (target) {
+      root.classList.add('ss-focus-has-target');
+      addFocusMarker(target, 'ss-focus-main');
+      let current = target;
+      while (current && current !== document.body) {
+        addFocusMarker(current, 'ss-focus-content');
+        current = current.parentElement;
+      }
+    }
+    root.dataset.ssFocusColor = A.normalizeFocusOutlineColor(outlineColor || settings.focusOutlineColor);
   }
 
   function report() {
+    if (!settings.diagnostics) return;
     const d = A.diagnostics();
-    toast('Page health (observed)', `${d.resources} resources · ${d.slowResources} slow · ${d.failedResources} possibly failed. These are local signals, not proof of an ISP or server issue.`, 'alert');
+    toast('Page health (observed)', `${d.resources} resources · ${d.slowResources} slow · ${d.failedResources} possibly failed. These are local signals, not proof of an ISP or server issue.`);
   }
 
   function apply(next = {}) {
+    const incoming = next && typeof next === 'object' ? next : {};
     settings = {
       ...settings,
-      ...next,
-      notificationPosition: A.normalizeNotificationPosition(next.notificationPosition || settings.notificationPosition),
-      focusOutlineColor: A.normalizeFocusOutlineColor(next.focusOutlineColor || settings.focusOutlineColor)
+      ...incoming,
+      notificationPosition: A.normalizeNotificationPosition(incoming.notificationPosition || settings.notificationPosition),
+      focusOutlineColor: A.normalizeFocusOutlineColor(incoming.focusOutlineColor || settings.focusOutlineColor)
     };
     focus(settings.focus, settings.focusOutlineColor);
     if (settings.popups) dismissPopups();
     scheduleScan(true);
-    reportRisk();
+  }
+
+  function hasCandidate(node) {
+    if (!node) return false;
+    if (node.nodeType === 1) return Boolean(node.matches?.(candidateSelector) || node.querySelector?.(candidateSelector));
+    return Boolean(node.parentElement?.closest?.(candidateSelector));
+  }
+
+  function onlySuperSurfClassChange(record) {
+    if (record.attributeName !== 'class') return false;
+    const superSurfClasses = /\b(?:ss-broken-link|ss-download-link|ss-focus-mode|ss-focus-has-target|ss-focus-main|ss-focus-content)\b/g;
+    const strip = value => String(value || '').replace(superSurfClasses, '').replace(/\s+/g, ' ').trim();
+    return strip(record.oldValue) === strip(record.target.getAttribute('class'));
+  }
+
+  function mutationNeedsScan(record) {
+    if (record.target?.closest?.('.ss-panel')) return false;
+    if (record.type === 'childList') {
+      if (record.target?.matches?.(candidateSelector) || record.target?.closest?.(candidateSelector)) return true;
+      return [...record.addedNodes, ...record.removedNodes].some(hasCandidate);
+    }
+    if (record.type === 'attributes' && onlySuperSurfClassChange(record)) return false;
+    if (record.target?.matches?.(candidateSelector) || record.target?.closest?.(candidateSelector)) return true;
+    if (record.attributeName === 'id') return true;
+    return record.attributeName !== 'class' && record.attributeName !== 'id' ? false : hasCandidate(record.target);
   }
 
   chrome.storage.local.get(defaults, apply);
   chrome.runtime.onMessage.addListener((msg, _sender, reply) => {
-    if (msg.type === 'apply') { apply(msg.settings); reply({ ok: true }); }
+    if (msg.type === 'apply') {
+      apply(msg.settings);
+      reply({ ok: true });
+    }
     if (msg.type === 'diagnostics') report();
-    if (msg.type === 'selection-answer') toast('Search selected text', 'A Google results tab was opened by your context-menu action. ClearView sends no selected text to a private AI service.', 'selection');
+    if (msg.type === 'selection-answer') toast('Search selected text', 'A Google results tab was opened by your context-menu action. SuperSurf sends no selected text to a private AI service.', 'selection');
   });
-  new MutationObserver(() => scheduleScan()).observe(document.documentElement, { childList: true, subtree: true });
-  window.addEventListener('load', () => { if (settings.diagnostics) send('page-ready', { diagnostics: A.diagnostics() }); }, { once: true });
+
+  if (typeof MutationObserver === 'function') {
+    new MutationObserver(records => {
+      if (records.some(mutationNeedsScan)) scheduleScan();
+    }).observe(document.documentElement, {
+      childList: true,
+      subtree: true,
+      attributes: true,
+      attributeOldValue: true,
+      attributeFilter: ['href', 'download', 'data-href', 'aria-label', 'role', 'id', 'class']
+    });
+  }
 })();

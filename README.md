@@ -1,60 +1,56 @@
-# ClearView
+# SuperSurf
 
-ClearView is a Chrome extension for calmer, more understandable web pages. It can reduce distracting overlays, point out likely broken links, highlight likely download actions, and add a reversible Focus mode. All of these features are designed to be cautious and explainable.
+SuperSurf is a privacy-first Chrome extension for calmer, more understandable web pages. It keeps the useful parts of everyday browsing visible without taking actions on your behalf.
 
-## Install
+## What SuperSurf does
 
-### From a GitHub Release
+- **Dismiss safe popups** closes ad-focused overlays only. Sign-in, payment, consent and security dialogs stay untouched.
+- **Mark broken links** marks obvious local problems such as missing, empty or unsupported destinations. A link that needs a network request is not treated as broken.
+- **Highlight likely downloads** makes likely file and export actions easier to spot without clicking them or starting a download.
+- **Focus mode** reduces visual distractions around the main reading area and can be turned off at any time. `Alt+Shift+F` toggles it.
+- **Page health check** reports browser-visible timing and resource signals locally. It is an observation, not a definitive diagnosis.
+- **Explicit selected-text search** adds one context-menu action that opens a Google search only when you choose it. A confirmation for that action appears in the bottom-right corner; regular notices can be placed at the top-right or top-left.
 
-1. Download the latest `clearview-v*.zip` from the repository's **Releases** page.
-2. Unzip it into a folder you can keep on your computer. The folder must contain `manifest.json` at its top level.
+Settings are stored in Chrome's local extension storage on this device. SuperSurf does not collect browsing history, use analytics, load remote scripts, set cookies or upload page contents.
+
+## Install on Chrome
+
+GitHub cannot auto-install Chrome extensions. **Load unpacked is required** for this project; a GitHub download is not a one-click Chrome installation.
+
+1. Download `supersurf-v1.2.0.zip` from the repository's **Releases** page.
+2. Unzip it into a folder you want to keep. `manifest.json` must be directly inside that folder.
 3. Open `chrome://extensions` in Chrome and turn on **Developer mode**.
-4. Choose **Load unpacked** and select the unzipped ClearView folder.
-5. Pin ClearView from Chrome's extensions menu if you want quick access to its home popup.
+4. Choose **Load unpacked** and select the unzipped SuperSurf folder.
+5. Pin SuperSurf from Chrome's extensions menu for quick access.
 
-Chrome may disable an unpacked extension when its folder is moved or deleted. Keep the folder in place while using it.
+Keep the folder in place while using the extension. Chrome may disable an unpacked extension when its folder is moved or deleted.
 
-### Build from this repository
+## Use and customize
 
-Requirements: Node **20.18.0** or a compatible newer Node release (the pinned version is in `.nvmrc`) and npm.
+Click the SuperSurf toolbar icon to open the controls. Changes are saved locally and can be reversed at any time. Open **More settings and safety notes** to choose regular notice placement, customize the Focus outline color (gold, blue or green), read the privacy notes and use the removal flow.
 
-```bash
-npm ci
-npm test
-npm run build
-```
+To search selected text, select text on a normal web page, open the context menu and choose **Search selected text with Google**. SuperSurf opens the results only after that explicit choice.
 
-The build creates an unpacked extension in `dist/` and a release-ready archive at `dist/clearview-v1.1.0.zip`. The archive has `manifest.json` at its root and does not contain a copy of itself.
+Chrome-managed pages and the Chrome Web Store do not allow SuperSurf's page tools.
 
-## Use ClearView
+## Remove SuperSurf
 
-Click the ClearView toolbar icon to open the home popup. Its controls are saved on this device:
+Open **More settings and safety notes**, scroll to **Remove SuperSurf** and choose **Remove SuperSurf**. SuperSurf opens `chrome://extensions`, where Chrome asks you to confirm removal.
 
-- **Dismiss safe popups** closes only ad-focused overlays. Sign-in, payment, consent and security dialogs are left alone.
-- **Mark broken links** underlines links that have obvious local problems. A cross-site link may still need a network check.
-- **Surface download buttons** highlights likely download or export actions without clicking them.
-- **Focus mode** reduces motion and visual distractions around the main reading area. `Alt+Shift+F` is also available as a shortcut.
-- **Phishing and malware alerts** shows local heuristic warnings. These warnings are signals to review, not security verdicts.
+## Hackathon submission
 
-Open **More settings and safety notes** for the full preferences page. There you can choose regular notice placement (top-right or top-left) and the Focus outline color (gold, blue or green). Selection-search confirmations always remain in the bottom-right corner.
+SuperSurf is a Manifest V3 extension focused on small, reversible improvements to web comprehension: safer ad-only popup dismissal, obvious link and download cues, a reversible reading mode, a local page health check and an explicit Google search action. The interface explains what each control does and keeps page observations on the device.
 
-To search selected text, select it on a normal web page, open the context menu, and choose the single ClearView selection-search item. A Google results tab opens only after that action.
+### Limitations
 
-Chrome-managed pages and the Chrome Web Store do not allow ClearView's page tools.
+- SuperSurf only runs on regular `http://` and `https://` pages where Chrome permits content extensions.
+- Link and download markers use explainable browser-visible signals; they cannot prove that a remote destination exists or that an action is safe.
+- Focus mode changes presentation and can be disabled immediately; it does not remove page content or bypass access controls.
+- SuperSurf never submits forms, starts downloads automatically or changes browser security settings.
 
-## Safety and privacy
+## Build a release locally
 
-ClearView processes its page observations locally. It does not collect browsing history, use analytics, load remote scripts, set cookies, upload page contents, or call a private AI service. Diagnostics describe browser-visible signals and cannot prove an ISP, server, phishing or malware condition.
-
-ClearView does not bypass paywalls, CAPTCHAs, security warnings, consent choices, access controls or server-controlled waits. It never submits forms, starts downloads, or changes a page's security settings.
-
-## Remove ClearView
-
-Open **More settings and safety notes**, scroll to **Remove ClearView**, and choose **Remove ClearView**. Chrome requires you to confirm the removal in its extensions manager, so ClearView opens `chrome://extensions` for that confirmation instead of removing itself silently.
-
-## Test and release
-
-Run the same checks used for a release from the repository root:
+Requirements: Node **20.18.0** and npm. The pinned Node version is in `.nvmrc`.
 
 ```bash
 npm ci
@@ -62,4 +58,4 @@ npm test
 npm run build
 ```
 
-`npm test` runs the offline test suite. `npm run build` recreates `dist/`, copies the extension files, and creates `dist/clearview-v1.1.0.zip`. To publish a GitHub Release, upload that zip as a release asset and include its version in the release title. Users should unzip the asset before choosing **Load unpacked** in Chrome.
+The build recreates `dist/` and creates `dist/supersurf-v1.2.0.zip`. The archive has `manifest.json` at its root and does not contain a nested copy of itself. To publish a GitHub Release, upload that archive and tell users to unzip it before choosing **Load unpacked**.

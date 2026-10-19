@@ -1,9 +1,9 @@
 {
-  "name": "clearview-browser-extension",
-  "version": "1.1.0",
+  "name": "supersurf-browser-extension",
+  "version": "1.2.0",
   "private": true,
   "type": "module",
-  "description": "ClearView: a privacy-first Chrome extension for calmer, more understandable web pages.",
+  "description": "SuperSurf: a privacy-first Chrome extension for calmer, more understandable web pages.",
   "scripts": {
     "test": "node --test tests/*.test.js",
     "build": "node scripts/build.mjs",

@@ -3,16 +3,16 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width">
-  <title>ClearView settings</title>
+  <title>SuperSurf settings</title>
   <link rel="stylesheet" href="options.css">
 </head>
 <body>
   <main>
     <header class="page-header">
       <a class="back" href="../popup/popup.html">← Back to controls</a>
-      <p class="eyebrow">CLEARVIEW / SETTINGS</p>
+      <p class="eyebrow">SUPERSURF / SETTINGS</p>
       <h1>A clearer web, by default.</h1>
-      <p class="lead">Choose how ClearView helps on the pages you visit. Your choices are saved on this device and can be changed at any time.</p>
+      <p class="lead">Choose how SuperSurf helps on the pages you visit. Your choices are saved on this device and can be changed at any time.</p>
     </header>
 
     <section class="settings-card" aria-labelledby="protection-heading">
@@ -39,16 +39,11 @@
         <input id="focus" type="checkbox">
         <span class="switch" aria-hidden="true"></span>
       </label>
-      <label class="setting-toggle">
-        <span><b>Phishing and malware alerts</b><small>Shows local heuristic warnings. ClearView does not make a security verdict or upload page data.</small></span>
-        <input id="riskAlerts" type="checkbox">
-        <span class="switch" aria-hidden="true"></span>
-      </label>
     </section>
 
     <section class="settings-card" aria-labelledby="notice-heading">
       <h2 id="notice-heading">Notice position</h2>
-      <p class="section-intro">Choose where regular ClearView notices appear. Selection-search confirmations always stay in the bottom-right corner.</p>
+      <p class="section-intro">Choose where regular SuperSurf notices appear. A selection-search confirmation is separate and always stays in the bottom-right corner, close to the action you explicitly chose.</p>
       <fieldset class="choice-grid">
         <legend class="sr-only">Regular notice position</legend>
         <label class="choice">
@@ -85,16 +80,16 @@
     <section class="settings-card" aria-labelledby="safety-heading">
       <h2 id="safety-heading">Safety and privacy</h2>
       <ul>
-        <li>ClearView makes local, explainable observations. It does not bypass paywalls, CAPTCHAs, security warnings, consent choices or access controls.</li>
+        <li>SuperSurf makes local, explainable observations. It does not bypass paywalls, CAPTCHAs, security warnings, consent choices or access controls.</li>
         <li>There are no analytics, remote scripts, cookies or page uploads. Selected text opens an explicit Google search only after you choose the context-menu action.</li>
-        <li>Page health and phishing or malware notices are hints from browser-visible signals, not a definitive diagnosis.</li>
+        <li>The page health check reports browser-visible timing and resource signals; it is not a definitive diagnosis.</li>
       </ul>
     </section>
 
     <section class="settings-card remove-card" aria-labelledby="remove-heading">
-      <h2 id="remove-heading">Remove ClearView</h2>
-      <p>Chrome requires you to confirm removal in its extensions manager. ClearView cannot remove itself silently.</p>
-      <button id="removeClearView" class="danger" type="button">Remove ClearView</button>
+      <h2 id="remove-heading">Remove SuperSurf</h2>
+      <p>Chrome requires you to confirm removal in its extensions manager. SuperSurf cannot remove itself silently.</p>
+      <button id="removeSuperSurf" class="danger" type="button">Remove SuperSurf</button>
       <p id="removeStatus" class="inline-status" role="status" aria-live="polite"></p>
     </section>
 

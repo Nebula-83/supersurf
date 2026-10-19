@@ -3,7 +3,7 @@ import { join, relative, sep } from 'node:path';
 
 const out = 'dist';
 const manifest = JSON.parse(await readFile('manifest.json', 'utf8'));
-const archiveName = `clearview-v${manifest.version}.zip`;
+const archiveName = `supersurf-v${manifest.version}.zip`;
 const crcTable = Array.from({ length: 256 }, (_, index) => {
   let value = index;
   for (let bit = 0; bit < 8; bit++) value = value & 1 ? 0xedb88320 ^ (value >>> 1) : value >>> 1;
