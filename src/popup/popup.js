@@ -4,12 +4,13 @@ const defaults = {
   downloads: true,
   focus: false,
   diagnostics: true,
+  selectionSearch: true,
   notificationPosition: 'top-right',
   focusOutlineColor: 'gold'
 };
 
 const settingKeys = Object.keys(defaults);
-const toggleIds = ['popups', 'links', 'downloads', 'focus'];
+const toggleIds = ['popups', 'links', 'downloads', 'focus', 'selectionSearch'];
 const positionIds = ['notification-top-right', 'notification-top-left'];
 const colorIds = ['focus-color-gold', 'focus-color-blue', 'focus-color-green'];
 const query = (id) => document.getElementById(id);
@@ -40,7 +41,7 @@ function normalizeSettings(values = {}) {
   settingKeys.forEach((key) => {
     if (Object.prototype.hasOwnProperty.call(values, key)) settings[key] = values[key];
   });
-  ['popups', 'links', 'downloads', 'focus', 'diagnostics'].forEach((key) => {
+  ['popups', 'links', 'downloads', 'focus', 'diagnostics', 'selectionSearch'].forEach((key) => {
     settings[key] = Boolean(settings[key]);
   });
   if (!['top-right', 'top-left'].includes(settings.notificationPosition)) settings.notificationPosition = defaults.notificationPosition;

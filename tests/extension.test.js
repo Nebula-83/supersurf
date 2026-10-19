@@ -12,9 +12,10 @@ test('manifest is a Chrome MV3 extension with local entry points', async () => {
   const manifest = JSON.parse(await readFile('manifest.json', 'utf8'));
   assert.equal(manifest.manifest_version, 3);
   assert.equal(manifest.name, 'SuperSurf');
-  assert.equal(manifest.version, '1.2.0');
+  assert.equal(manifest.version, '1.3.0');
   assert.equal(manifest.background.service_worker, 'src/background/service-worker.js');
   assert.ok(manifest.content_scripts[0].js.includes('src/shared/analyzers.js'));
+  assert.ok(!manifest.permissions.includes('contextMenus'));
   assert.ok(!manifest.content_scripts.some(script => script.js.some(file => /^https?:/.test(file))));
 });
 
@@ -73,16 +74,24 @@ test('diagnostics are conservative and local', () => {
   assert.deepEqual({ slowResources: isolated.slowResources, failedResources: isolated.failedResources }, { slowResources: 1, failedResources: 1 });
 });
 
-test('the reduced contract uses local storage and one explicit selection menu', async () => {
+test('the reduced contract uses local storage and automatic selection search', async () => {
   const content = await readFile('src/content/content-script.js', 'utf8');
   const background = await readFile('src/background/service-worker.js', 'utf8');
+  const manifest = JSON.parse(await readFile('manifest.json', 'utf8'));
   assert.match(content, /chrome\.storage\.local\.get/);
   assert.doesNotMatch(content, /chrome\.storage\.(?:sync|session)/);
   assert.match(background, /chrome\.storage\.local/);
   assert.doesNotMatch(background, /chrome\.storage\.(?:sync|session)/);
-  assert.equal((background.match(/contextMenus\.create/g) || []).length, 1);
-  assert.match(background, /contexts: \['selection'\]/);
+  assert.doesNotMatch(background, /contextMenus/);
+  assert.match(content, /document\.addEventListener\('mouseup'/);
+  assert.match(content, /window\.getSelection/);
+  assert.match(content, /send\('selection-search'/);
+  assert.match(background, /chrome\.windows\?\.create/);
+  assert.match(background, /type: 'popup'/);
+  assert.match(background, /left: 0/);
+  assert.match(background, /top: 0/);
   assert.match(background, /https:\/\/www\.google\.com\/search\?q=/);
+  assert.ok(!manifest.permissions.includes('contextMenus'));
 });
 
 test('scans are debounced, skip unchanged pages, and protect sensitive controls', async () => {
@@ -105,12 +114,21 @@ test('markers and notices stay visual, reversible, and positioned by contract', 
    assert.match(css, /\.ss-download-link/);
   assert.match(css, /#52b788/);
   assert.doesNotMatch(css, /content\s*:/);
-  assert.match(content, /kind === 'selection' \? 'bottom-right'/);
+   assert.doesNotMatch(content, /selection-answer|context-menu/);
    assert.match(content, /root\.classList\.toggle\('ss-focus-mode'/);
    assert.match(content, /delete root\.dataset\.ssFocusColor/);
-   assert.match(css, /data-ss-position="bottom-right"/);
    assert.match(css, /data-ss-position="top-right"/);
    assert.match(css, /data-ss-position="top-left"/);
+});
+
+test('home and settings expose automatic selection search as a safe toggle', async () => {
+  const popup = await readFile('src/popup/popup.html', 'utf8');
+  const options = await readFile('src/options/options.html', 'utf8');
+  const popupScript = await readFile('src/popup/popup.js', 'utf8');
+  assert.match(popup, /id="selectionSearch"/);
+  assert.match(options, /id="selectionSearch"/);
+  assert.match(popupScript, /selectionSearch: true/);
+  assert.match(popupScript, /'selectionSearch'/);
 });
 
 test('analyzer exports contain only the focused local tools', () => {

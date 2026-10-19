@@ -9,7 +9,7 @@ SuperSurf is a privacy-first Chrome extension for calmer, more understandable we
 - **Highlight likely downloads** makes likely file and export actions easier to spot without clicking them or starting a download.
 - **Focus mode** reduces visual distractions around the main reading area and can be turned off at any time. `Alt+Shift+F` toggles it.
 - **Page health check** reports browser-visible timing and resource signals locally. It is an observation, not a definitive diagnosis.
-- **Explicit selected-text search** adds one context-menu action that opens a Google search only when you choose it. A confirmation for that action appears in the bottom-right corner; regular notices can be placed at the top-right or top-left.
+- **Automatic selected-text search** starts when you hold the left mouse button, select text, and release. Google opens the results in a compact popup at the top-left while the original page keeps its selection. This can be turned off in settings.
 
 Settings are stored in Chrome's local extension storage on this device. SuperSurf does not collect browsing history, use analytics, load remote scripts, set cookies or upload page contents.
 
@@ -17,7 +17,7 @@ Settings are stored in Chrome's local extension storage on this device. SuperSur
 
 GitHub cannot auto-install Chrome extensions. **Load unpacked is required** for this project; a GitHub download is not a one-click Chrome installation.
 
-1. Download `supersurf-v1.2.0.zip` from the repository's **Releases** page.
+1. Download `supersurf-v1.3.0.zip` from the repository's **Releases** page.
 2. Unzip it into a folder you want to keep. `manifest.json` must be directly inside that folder.
 3. Open `chrome://extensions` in Chrome and turn on **Developer mode**.
 4. Choose **Load unpacked** and select the unzipped SuperSurf folder.
@@ -27,9 +27,9 @@ Keep the folder in place while using the extension. Chrome may disable an unpack
 
 ## Use and customize
 
-Click the SuperSurf toolbar icon to open the controls. Changes are saved locally and can be reversed at any time. Open **More settings and safety notes** to choose regular notice placement, customize the Focus outline color (gold, blue or green), read the privacy notes and use the removal flow.
+Click the SuperSurf toolbar icon to open the controls. Changes are saved locally and can be reversed at any time. Open **More settings and safety notes** to choose regular notice placement, customize the Focus outline color (gold, blue or green), enable or disable automatic selection search, read the privacy notes and use the removal flow.
 
-To search selected text, select text on a normal web page, open the context menu and choose **Search selected text with Google**. SuperSurf opens the results only after that explicit choice.
+To search selected text, hold the left mouse button, drag across text on a normal web page, and release. When automatic selection search is enabled, SuperSurf opens a compact Google results window at the top-left. It does not trigger on hovering.
 
 Chrome-managed pages and the Chrome Web Store do not allow SuperSurf's page tools.
 
@@ -37,11 +37,7 @@ Chrome-managed pages and the Chrome Web Store do not allow SuperSurf's page tool
 
 Open **More settings and safety notes**, scroll to **Remove SuperSurf** and choose **Remove SuperSurf**. SuperSurf opens `chrome://extensions`, where Chrome asks you to confirm removal.
 
-## Hackathon submission
-
-SuperSurf is a Manifest V3 extension focused on small, reversible improvements to web comprehension: safer ad-only popup dismissal, obvious link and download cues, a reversible reading mode, a local page health check and an explicit Google search action. The interface explains what each control does and keeps page observations on the device.
-
-### Limitations
+## Limitations
 
 - SuperSurf only runs on regular `http://` and `https://` pages where Chrome permits content extensions.
 - Link and download markers use explainable browser-visible signals; they cannot prove that a remote destination exists or that an action is safe.
@@ -58,4 +54,4 @@ npm test
 npm run build
 ```
 
-The build recreates `dist/` and creates `dist/supersurf-v1.2.0.zip`. The archive has `manifest.json` at its root and does not contain a nested copy of itself. To publish a GitHub Release, upload that archive and tell users to unzip it before choosing **Load unpacked**.
+The build recreates `dist/` and creates `dist/supersurf-v1.3.0.zip`. The archive has `manifest.json` at its root and does not contain a nested copy of itself. To publish a GitHub Release, upload that archive and tell users to unzip it before choosing **Load unpacked**.

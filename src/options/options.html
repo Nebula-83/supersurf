@@ -39,11 +39,16 @@
         <input id="focus" type="checkbox">
         <span class="switch" aria-hidden="true"></span>
       </label>
+      <label class="setting-toggle">
+        <span><b>Auto-search selected text</b><small>Hold the left mouse button to select text, then release. Google opens in a compact window at the top-left.</small></span>
+        <input id="selectionSearch" type="checkbox">
+        <span class="switch" aria-hidden="true"></span>
+      </label>
     </section>
 
     <section class="settings-card" aria-labelledby="notice-heading">
       <h2 id="notice-heading">Notice position</h2>
-      <p class="section-intro">Choose where regular SuperSurf notices appear. A selection-search confirmation is separate and always stays in the bottom-right corner, close to the action you explicitly chose.</p>
+        <p class="section-intro">Choose where regular SuperSurf notices appear. Automatic selection search opens its own compact Google window at the top-left.</p>
       <fieldset class="choice-grid">
         <legend class="sr-only">Regular notice position</legend>
         <label class="choice">
@@ -81,7 +86,7 @@
       <h2 id="safety-heading">Safety and privacy</h2>
       <ul>
         <li>SuperSurf makes local, explainable observations. It does not bypass paywalls, CAPTCHAs, security warnings, consent choices or access controls.</li>
-        <li>There are no analytics, remote scripts, cookies or page uploads. Selected text opens an explicit Google search only after you choose the context-menu action.</li>
+        <li>There are no analytics, remote scripts, cookies or page uploads. Selected text is sent to Google only when automatic selection search is enabled and you release the left mouse button after selecting.</li>
         <li>The page health check reports browser-visible timing and resource signals; it is not a definitive diagnosis.</li>
       </ul>
     </section>

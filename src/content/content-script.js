@@ -6,6 +6,7 @@
     downloads: true,
     focus: false,
     diagnostics: true,
+    selectionSearch: true,
     notificationPosition: 'top-right',
     focusOutlineColor: 'gold'
   };
@@ -16,15 +17,25 @@
   let scanTimer = 0;
   let lastScanAt = 0;
   let lastScanSignature = '';
+  let lastSelectionKey = '';
+  let lastSelectionSearchAt = 0;
   const focusMarkers = new Map();
 
-  function toast(title, body, kind = 'alert') {
+  function send(type, payload = {}) {
+    try {
+      const result = chrome.runtime.sendMessage({ type, ...payload });
+      result?.catch?.(() => {});
+    } catch {
+      // Restricted or closed pages can reject extension messages.
+    }
+  }
+
+  function toast(title, body) {
     document.querySelector('.ss-panel')?.remove();
     const box = document.createElement('aside');
     box.className = 'ss-panel';
-    const position = kind === 'selection' ? 'bottom-right' : A.normalizeNotificationPosition(settings.notificationPosition);
+    const position = A.normalizeNotificationPosition(settings.notificationPosition);
     box.dataset.ssPosition = position;
-    box.dataset.ssNoticeKind = kind;
 
     const close = document.createElement('button');
     close.type = 'button';
@@ -178,6 +189,33 @@
     toast('Page health (observed)', `${d.resources} resources · ${d.slowResources} slow · ${d.failedResources} possibly failed. These are local signals, not proof of an ISP or server issue.`);
   }
 
+  function selectionWindowSize() {
+    const width = Number(window.screen?.availWidth || window.innerWidth || 1440);
+    const height = Number(window.screen?.availHeight || window.innerHeight || 900);
+    return {
+      width: Math.max(320, Math.min(620, Math.round(width * 0.2))),
+      height: Math.max(240, Math.min(520, Math.round(height * 0.25)))
+    };
+  }
+
+  function searchSelectionAfterMouseUp(event) {
+    if (!settings.selectionSearch || event.button !== 0) return;
+    if (event.target?.closest?.('input,textarea,select,[contenteditable="true"],.ss-panel')) return;
+
+    window.setTimeout(() => {
+      const selection = window.getSelection?.();
+      const text = selection?.toString?.().replace(/\s+/g, ' ').trim().slice(0, 2000) || '';
+      if (!text || !selection || selection.rangeCount === 0) return;
+
+      const now = Date.now();
+      const key = `${text}\u001f${selection.anchorOffset}\u001f${selection.focusOffset}`;
+      if (key === lastSelectionKey && now - lastSelectionSearchAt < 1500) return;
+      lastSelectionKey = key;
+      lastSelectionSearchAt = now;
+      send('selection-search', { text, ...selectionWindowSize() });
+    }, 0);
+  }
+
   function apply(next = {}) {
     const incoming = next && typeof next === 'object' ? next : {};
     settings = {
@@ -223,8 +261,9 @@
       reply({ ok: true });
     }
     if (msg.type === 'diagnostics') report();
-    if (msg.type === 'selection-answer') toast('Search selected text', 'A Google results tab was opened by your context-menu action. SuperSurf sends no selected text to a private AI service.', 'selection');
   });
+
+  document.addEventListener('mouseup', searchSelectionAfterMouseUp, true);
 
   if (typeof MutationObserver === 'function') {
     new MutationObserver(records => {

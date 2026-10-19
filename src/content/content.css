@@ -11,7 +11,6 @@
 .ss-focus-mode[data-ss-focus-color="green"] .ss-focus-main { outline-color: #52b788 !important; }
 
 .ss-panel { position: fixed !important; z-index: 2147483647 !important; top: auto !important; right: auto !important; bottom: auto !important; left: auto !important; width: min(360px, calc(100vw - 36px)) !important; background: #102a43 !important; color: #f7fafc !important; border: 1px solid #486581 !important; border-radius: 14px !important; box-shadow: 0 14px 40px #102a4388 !important; padding: 16px !important; font: 13px/1.45 system-ui,sans-serif !important; }
-.ss-panel[data-ss-position="bottom-right"] { right: 18px !important; bottom: 18px !important; }
 .ss-panel[data-ss-position="top-right"] { right: 18px !important; top: 18px !important; }
 .ss-panel[data-ss-position="top-left"] { left: 18px !important; top: 18px !important; }
 .ss-panel button { float: right; background: transparent; color: #f6c453; border: 0; font-size: 18px; cursor: pointer; }
