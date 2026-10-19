@@ -13,30 +13,38 @@ chrome.runtime.onInstalled.addListener(() => {
   chrome.storage.local.get(defaults, values => chrome.storage.local.set(values));
 });
 
-function clamp(value, minimum, maximum, fallback) {
-  const number = Number(value);
-  return Number.isFinite(number) ? Math.min(maximum, Math.max(minimum, Math.round(number))) : fallback;
+const selectionWindows = new Map();
+
+async function closeSelectionSearch(tabId) {
+  const windowId = selectionWindows.get(tabId);
+  if (!windowId) return;
+  selectionWindows.delete(tabId);
+  try {
+    await chrome.windows.remove(windowId);
+  } catch {
+    // The user may have already closed the search window.
+  }
 }
 
-async function openSelectionSearch(message) {
+async function openSelectionSearch(message, tabId) {
   const text = typeof message.text === 'string' ? message.text.trim().slice(0, 2000) : '';
   if (!text) return;
 
+  await closeSelectionSearch(tabId);
   const url = `https://www.google.com/search?q=${encodeURIComponent(text)}`;
-  const width = clamp(message.width, 320, 620, 420);
-  const height = clamp(message.height, 240, 520, 320);
   const popup = {
     url,
     type: 'popup',
-    width,
-    height,
+    width: 540,
+    height: 800,
     left: 0,
     top: 0,
-    focused: false
+    focused: true
   };
 
   if (chrome.windows?.create) {
-    await chrome.windows.create(popup);
+    const created = await chrome.windows.create(popup);
+    if (created?.id) selectionWindows.set(tabId, created.id);
     return;
   }
   await chrome.tabs.create({ url });
@@ -44,7 +52,12 @@ async function openSelectionSearch(message) {
 
 chrome.runtime.onMessage.addListener((message, sender) => {
   if (message?.type !== 'selection-search' || !sender.tab?.id) return;
-  openSelectionSearch(message).catch(() => {});
+  openSelectionSearch(message, sender.tab.id).catch(() => {});
+});
+
+chrome.runtime.onMessage.addListener((message, sender) => {
+  if (message?.type !== 'selection-cleared' || !sender.tab?.id) return;
+  closeSelectionSearch(sender.tab.id).catch(() => {});
 });
 
 chrome.commands.onCommand.addListener(async (command) => {

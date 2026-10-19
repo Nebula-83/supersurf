@@ -12,7 +12,7 @@ test('manifest is a Chrome MV3 extension with local entry points', async () => {
   const manifest = JSON.parse(await readFile('manifest.json', 'utf8'));
   assert.equal(manifest.manifest_version, 3);
   assert.equal(manifest.name, 'SuperSurf');
-  assert.equal(manifest.version, '1.3.0');
+  assert.equal(manifest.version, '1.3.1');
   assert.equal(manifest.background.service_worker, 'src/background/service-worker.js');
   assert.ok(manifest.content_scripts[0].js.includes('src/shared/analyzers.js'));
   assert.ok(!manifest.permissions.includes('contextMenus'));
@@ -88,8 +88,13 @@ test('the reduced contract uses local storage and automatic selection search', a
   assert.match(content, /send\('selection-search'/);
   assert.match(background, /chrome\.windows\?\.create/);
   assert.match(background, /type: 'popup'/);
+  assert.match(background, /width: 540/);
+  assert.match(background, /height: 800/);
+  assert.match(background, /focused: true/);
   assert.match(background, /left: 0/);
   assert.match(background, /top: 0/);
+  assert.match(background, /selection-cleared/);
+  assert.match(background, /chrome\.windows\.remove/);
   assert.match(background, /https:\/\/www\.google\.com\/search\?q=/);
   assert.ok(!manifest.permissions.includes('contextMenus'));
 });

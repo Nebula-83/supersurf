@@ -189,13 +189,8 @@
     toast('Page health (observed)', `${d.resources} resources · ${d.slowResources} slow · ${d.failedResources} possibly failed. These are local signals, not proof of an ISP or server issue.`);
   }
 
-  function selectionWindowSize() {
-    const width = Number(window.screen?.availWidth || window.innerWidth || 1440);
-    const height = Number(window.screen?.availHeight || window.innerHeight || 900);
-    return {
-      width: Math.max(320, Math.min(620, Math.round(width * 0.2))),
-      height: Math.max(240, Math.min(520, Math.round(height * 0.25)))
-    };
+  function clearSelectionSearch() {
+    if (document.hasFocus?.() !== false) send('selection-cleared');
   }
 
   function searchSelectionAfterMouseUp(event) {
@@ -205,14 +200,17 @@
     window.setTimeout(() => {
       const selection = window.getSelection?.();
       const text = selection?.toString?.().replace(/\s+/g, ' ').trim().slice(0, 2000) || '';
-      if (!text || !selection || selection.rangeCount === 0) return;
+      if (!text || !selection || selection.rangeCount === 0) {
+        clearSelectionSearch();
+        return;
+      }
 
       const now = Date.now();
       const key = `${text}\u001f${selection.anchorOffset}\u001f${selection.focusOffset}`;
       if (key === lastSelectionKey && now - lastSelectionSearchAt < 1500) return;
       lastSelectionKey = key;
       lastSelectionSearchAt = now;
-      send('selection-search', { text, ...selectionWindowSize() });
+      send('selection-search', { text });
     }, 0);
   }
 
@@ -264,6 +262,11 @@
   });
 
   document.addEventListener('mouseup', searchSelectionAfterMouseUp, true);
+  document.addEventListener('selectionchange', () => {
+    const selection = window.getSelection?.();
+    if (selection?.toString?.().trim()) return;
+    window.setTimeout(clearSelectionSearch, 120);
+  });
 
   if (typeof MutationObserver === 'function') {
     new MutationObserver(records => {

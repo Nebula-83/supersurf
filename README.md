@@ -9,7 +9,7 @@ SuperSurf is a privacy-first Chrome extension for calmer, more understandable we
 - **Highlight likely downloads** makes likely file and export actions easier to spot without clicking them or starting a download.
 - **Focus mode** reduces visual distractions around the main reading area and can be turned off at any time. `Alt+Shift+F` toggles it.
 - **Page health check** reports browser-visible timing and resource signals locally. It is an observation, not a definitive diagnosis.
-- **Automatic selected-text search** starts when you hold the left mouse button, select text, and release. Google opens the results in a compact popup at the top-left while the original page keeps its selection. This can be turned off in settings.
+- **Automatic selected-text search** starts when you hold the left mouse button, select text, and release. Google opens focused in a 540 × 800 popup at the top-left while the original page keeps its selection. Clearing the selection closes that search popup. This can be turned off in settings.
 
 Settings are stored in Chrome's local extension storage on this device. SuperSurf does not collect browsing history, use analytics, load remote scripts, set cookies or upload page contents.
 
@@ -17,7 +17,7 @@ Settings are stored in Chrome's local extension storage on this device. SuperSur
 
 GitHub cannot auto-install Chrome extensions. **Load unpacked is required** for this project; a GitHub download is not a one-click Chrome installation.
 
-1. Download `supersurf-v1.3.0.zip` from the repository's **Releases** page.
+1. Download `supersurf-v1.3.1.zip` from the repository's **Releases** page.
 2. Unzip it into a folder you want to keep. `manifest.json` must be directly inside that folder.
 3. Open `chrome://extensions` in Chrome and turn on **Developer mode**.
 4. Choose **Load unpacked** and select the unzipped SuperSurf folder.
@@ -29,7 +29,7 @@ Keep the folder in place while using the extension. Chrome may disable an unpack
 
 Click the SuperSurf toolbar icon to open the controls. Changes are saved locally and can be reversed at any time. Open **More settings and safety notes** to choose regular notice placement, customize the Focus outline color (gold, blue or green), enable or disable automatic selection search, read the privacy notes and use the removal flow.
 
-To search selected text, hold the left mouse button, drag across text on a normal web page, and release. When automatic selection search is enabled, SuperSurf opens a compact Google results window at the top-left. It does not trigger on hovering.
+To search selected text, hold the left mouse button, drag across text on a normal web page, and release. When automatic selection search is enabled, SuperSurf opens a focused 540 × 800 Google results window at the top-left. Clearing the selection closes it. It does not trigger on hovering.
 
 Chrome-managed pages and the Chrome Web Store do not allow SuperSurf's page tools.
 
@@ -54,4 +54,4 @@ npm test
 npm run build
 ```
 
-The build recreates `dist/` and creates `dist/supersurf-v1.3.0.zip`. The archive has `manifest.json` at its root and does not contain a nested copy of itself. To publish a GitHub Release, upload that archive and tell users to unzip it before choosing **Load unpacked**.
+The build recreates `dist/` and creates `dist/supersurf-v1.3.1.zip`. The archive has `manifest.json` at its root and does not contain a nested copy of itself. To publish a GitHub Release, upload that archive and tell users to unzip it before choosing **Load unpacked**.
